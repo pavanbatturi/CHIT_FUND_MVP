@@ -33,6 +33,7 @@ function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
     req.userRole = decoded.role;
     next();
   } catch (error) {
+    insertErrorSchema.safeParse(error ?? "Error");
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
@@ -85,6 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error: any) {
+      insertErrorSchema.safeParse(error ?? "Error");
       return res.status(500).json({ message: error.message || "Server error" });
     }
   });
@@ -122,6 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error: any) {
+      insertErrorSchema.safeParse(error ?? "Error");
       return res.status(500).json({ message: error.message || "Server error" });
     }
   });
@@ -142,6 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: user.role,
         });
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -155,6 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const funds = await storage.getChitFunds();
         return res.json(funds);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -177,6 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         return res.json({ ...fund, members, userMembership });
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -203,6 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
         return res.status(201).json(membership);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(400).json({ message: error.message });
       }
     },
@@ -216,6 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const memberships = await storage.getUserMemberships(req.userId!);
         return res.json(memberships);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -229,6 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const userPayments = await storage.getPaymentsByUser(req.userId!);
         return res.json(userPayments);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -242,6 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const upcoming = await storage.getUpcomingPayments(req.userId!);
         return res.json(upcoming);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -292,6 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           memberships: membershipsData,
         });
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -326,6 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         return res.status(201).json(fund);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -342,6 +354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Chit fund not found" });
         return res.json(updated);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -358,6 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Chit fund not found" });
         return res.json({ message: "Deleted" });
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -381,6 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })),
         );
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -394,6 +409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const { userId, chitFundId } = req.body;
         if (!userId || !chitFundId) {
+          insertErrorSchema.safeParse("userId and chitFundId are required");
           return res
             .status(400)
             .json({ message: "userId and chitFundId are required" });
@@ -407,6 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const membership = await storage.createMembership(userId, chitFundId);
         return res.status(201).json(membership);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(400).json({ message: error.message });
       }
     },
@@ -449,6 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         return res.status(201).json({ count: createdPayments.length });
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -471,6 +489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Payment not found" });
         return res.json(updated);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -485,6 +504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const stats = await storage.getAdminStats();
         return res.json(stats);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -499,6 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const members = await storage.getMembershipsByChitFund(req.params.id);
         return res.json(members);
       } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
         return res.status(500).json({ message: error.message });
       }
     },
@@ -590,6 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.json({ message: "Seed data created successfully" });
     } catch (error: any) {
+      insertErrorSchema.safeParse(error ?? "Error");
       return res.status(500).json({ message: error.message });
     }
   });
