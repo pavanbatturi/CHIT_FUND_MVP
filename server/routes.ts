@@ -313,6 +313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         const parsed = insertChitFundSchema.safeParse(inputObj);
         if (!parsed.success) {
+          console.log(parsed.error);
           return res
             .status(400)
             .json({ message: "Invalid input", errors: parsed.error });
