@@ -1,15 +1,40 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  varchar,
+  integer,
+  decimal,
+  timestamp,
+  boolean,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
-export const chitStatusEnum = pgEnum("chit_status", ["active", "upcoming", "completed", "cancelled"]);
-export const paymentStatusEnum = pgEnum("payment_status", ["pending", "paid", "overdue", "partial"]);
-export const membershipStatusEnum = pgEnum("membership_status", ["active", "inactive", "removed"]);
+export const chitStatusEnum = pgEnum("chit_status", [
+  "active",
+  "upcoming",
+  "completed",
+  "cancelled",
+]);
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "paid",
+  "overdue",
+  "partial",
+]);
+export const membershipStatusEnum = pgEnum("membership_status", [
+  "active",
+  "inactive",
+  "removed",
+]);
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   phone: text("phone").notNull(),
@@ -19,7 +44,9 @@ export const users = pgTable("users", {
 });
 
 export const chitFunds = pgTable("chit_funds", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description"),
   totalAmount: integer("total_amount").notNull(),
@@ -36,19 +63,33 @@ export const chitFunds = pgTable("chit_funds", {
 });
 
 export const memberships = pgTable("memberships", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id),
-  chitFundId: varchar("chit_fund_id").notNull().references(() => chitFunds.id),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
+  chitFundId: varchar("chit_fund_id")
+    .notNull()
+    .references(() => chitFunds.id),
   slotNumber: integer("slot_number"),
   status: membershipStatusEnum("status").notNull().default("active"),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
 
 export const payments = pgTable("payments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  membershipId: varchar("membership_id").notNull().references(() => memberships.id),
-  userId: varchar("user_id").notNull().references(() => users.id),
-  chitFundId: varchar("chit_fund_id").notNull().references(() => chitFunds.id),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  membershipId: varchar("membership_id")
+    .notNull()
+    .references(() => memberships.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
+  chitFundId: varchar("chit_fund_id")
+    .notNull()
+    .references(() => chitFunds.id),
   amount: integer("amount").notNull(),
   monthNumber: integer("month_number").notNull(),
   dueDate: timestamp("due_date").notNull(),
@@ -87,8 +128,8 @@ export const insertChitFundSchema = createInsertSchema(chitFunds).pick({
   availableSlots: true,
   organizerName: true,
   organizerContact: true,
-  status: true,
-  startDate: true,
+  //status: false,
+  //startDate: false,
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).pick({
