@@ -101,10 +101,7 @@ export const payments = pgTable("payments", {
 });
 
 export const errorLogs = pgTable("errorlogs", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  error: jsonb("error").notNull(),
+  error: jsonb("error"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
