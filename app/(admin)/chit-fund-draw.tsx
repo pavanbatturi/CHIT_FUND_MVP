@@ -82,7 +82,7 @@ export default function LotteryScreen() {
       setLoading(true);
 
       await apiPost("/api/admin/spin-winner", {
-        chitFundId: "123",
+        chitFundId: "27d710a3-7fa4-4541-81a5-e3cfc7191db5",
         month: 1,
       });
     } catch (err) {
