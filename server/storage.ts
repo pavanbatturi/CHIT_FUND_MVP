@@ -1,9 +1,17 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, and, desc, count, sql } from "drizzle-orm";
 import {
-  users, chitFunds, memberships, payments,
-  type User, type InsertUser, type ChitFund, type InsertChitFund,
-  type Membership, type Payment, type InsertPayment,
+  users,
+  chitFunds,
+  memberships,
+  payments,
+  type User,
+  type InsertUser,
+  type ChitFund,
+  type InsertChitFund,
+  type Membership,
+  type Payment,
+  type InsertPayment,
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -20,22 +28,47 @@ export interface IStorage {
 
   getChitFunds(): Promise<ChitFund[]>;
   getChitFund(id: string): Promise<ChitFund | undefined>;
-  createChitFund(fund: InsertChitFund & { createdBy?: string }): Promise<ChitFund>;
-  updateChitFund(id: string, data: Partial<ChitFund>): Promise<ChitFund | undefined>;
+  createChitFund(
+    fund: InsertChitFund & { createdBy?: string },
+  ): Promise<ChitFund>;
+  updateChitFund(
+    id: string,
+    data: Partial<ChitFund>,
+  ): Promise<ChitFund | undefined>;
   deleteChitFund(id: string): Promise<boolean>;
 
-  getUserMemberships(userId: string): Promise<(Membership & { chitFund: ChitFund })[]>;
-  getMembershipsByChitFund(chitFundId: string): Promise<(Membership & { user: User })[]>;
+  getUserMemberships(
+    userId: string,
+  ): Promise<(Membership & { chitFund: ChitFund })[]>;
+  getMembershipsByChitFund(
+    chitFundId: string,
+  ): Promise<(Membership & { user: User })[]>;
   createMembership(userId: string, chitFundId: string): Promise<Membership>;
-  getMembership(userId: string, chitFundId: string): Promise<Membership | undefined>;
+  getMembership(
+    userId: string,
+    chitFundId: string,
+  ): Promise<Membership | undefined>;
 
-  getPaymentsByUser(userId: string): Promise<(Payment & { chitFundName: string })[]>;
+  getPaymentsByUser(
+    userId: string,
+  ): Promise<(Payment & { chitFundName: string })[]>;
   getPaymentsByMembership(membershipId: string): Promise<Payment[]>;
   createPayment(payment: InsertPayment): Promise<Payment>;
-  updatePaymentStatus(id: string, status: string, paidDate?: Date): Promise<Payment | undefined>;
-  getUpcomingPayments(userId: string): Promise<(Payment & { chitFundName: string })[]>;
+  updatePaymentStatus(
+    id: string,
+    status: string,
+    paidDate?: Date,
+  ): Promise<Payment | undefined>;
+  getUpcomingPayments(
+    userId: string,
+  ): Promise<(Payment & { chitFundName: string })[]>;
 
-  getAdminStats(): Promise<{ totalUsers: number; activeChitFunds: number; totalRevenue: number; totalPayments: number }>;
+  getAdminStats(): Promise<{
+    totalUsers: number;
+    activeChitFunds: number;
+    totalRevenue: number;
+    totalPayments: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -63,26 +96,43 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getChitFund(id: string): Promise<ChitFund | undefined> {
-    const [fund] = await db.select().from(chitFunds).where(eq(chitFunds.id, id));
+    const [fund] = await db
+      .select()
+      .from(chitFunds)
+      .where(eq(chitFunds.id, id));
     return fund;
   }
 
-  async createChitFund(fund: InsertChitFund & { createdBy?: string }): Promise<ChitFund> {
+  async createChitFund(
+    fund: InsertChitFund & { createdBy?: string },
+  ): Promise<ChitFund> {
     const [created] = await db.insert(chitFunds).values(fund).returning();
     return created;
   }
 
-  async updateChitFund(id: string, data: Partial<ChitFund>): Promise<ChitFund | undefined> {
-    const [updated] = await db.update(chitFunds).set(data).where(eq(chitFunds.id, id)).returning();
+  async updateChitFund(
+    id: string,
+    data: Partial<ChitFund>,
+  ): Promise<ChitFund | undefined> {
+    const [updated] = await db
+      .update(chitFunds)
+      .set(data)
+      .where(eq(chitFunds.id, id))
+      .returning();
     return updated;
   }
 
   async deleteChitFund(id: string): Promise<boolean> {
-    const result = await db.delete(chitFunds).where(eq(chitFunds.id, id)).returning();
+    const result = await db
+      .delete(chitFunds)
+      .where(eq(chitFunds.id, id))
+      .returning();
     return result.length > 0;
   }
 
-  async getUserMemberships(userId: string): Promise<(Membership & { chitFund: ChitFund })[]> {
+  async getUserMemberships(
+    userId: string,
+  ): Promise<(Membership & { chitFund: ChitFund })[]> {
     const results = await db
       .select()
       .from(memberships)
@@ -95,7 +145,9 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getMembershipsByChitFund(chitFundId: string): Promise<(Membership & { user: User })[]> {
+  async getMembershipsByChitFund(
+    chitFundId: string,
+  ): Promise<(Membership & { user: User })[]> {
     const results = await db
       .select()
       .from(memberships)
@@ -108,7 +160,10 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async createMembership(userId: string, chitFundId: string): Promise<Membership> {
+  async createMembership(
+    userId: string,
+    chitFundId: string,
+  ): Promise<Membership> {
     const fund = await this.getChitFund(chitFundId);
     if (!fund) throw new Error("Chit fund not found");
     if (fund.availableSlots <= 0) throw new Error("No available slots");
@@ -128,15 +183,25 @@ export class DatabaseStorage implements IStorage {
     return membership;
   }
 
-  async getMembership(userId: string, chitFundId: string): Promise<Membership | undefined> {
+  async getMembership(
+    userId: string,
+    chitFundId: string,
+  ): Promise<Membership | undefined> {
     const [membership] = await db
       .select()
       .from(memberships)
-      .where(and(eq(memberships.userId, userId), eq(memberships.chitFundId, chitFundId)));
+      .where(
+        and(
+          eq(memberships.userId, userId),
+          eq(memberships.chitFundId, chitFundId),
+        ),
+      );
     return membership;
   }
 
-  async getPaymentsByUser(userId: string): Promise<(Payment & { chitFundName: string })[]> {
+  async getPaymentsByUser(
+    userId: string,
+  ): Promise<(Payment & { chitFundName: string })[]> {
     const results = await db
       .select()
       .from(payments)
@@ -150,7 +215,9 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getPaymentsByChitFundId(chitFundId: string): Promise<(Payment & { chitFundName: string })[]> {
+  async getPaymentsByChitFundId(
+    chitFundId: string,
+  ): Promise<(Payment & { chitFundName: string })[]> {
     const results = await db
       .select()
       .from(payments)
@@ -177,14 +244,41 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updatePaymentStatus(id: string, status: string, paidDate?: Date): Promise<Payment | undefined> {
+  async updatePaymentStatus(
+    id: string,
+    status: string,
+    paidDate?: Date,
+  ): Promise<Payment | undefined> {
     const updateData: any = { status };
     if (paidDate) updateData.paidDate = paidDate;
-    const [updated] = await db.update(payments).set(updateData).where(eq(payments.id, id)).returning();
+    const [updated] = await db
+      .update(payments)
+      .set(updateData)
+      .where(eq(payments.id, id))
+      .returning();
     return updated;
   }
 
-  async getUpcomingPayments(userId: string): Promise<(Payment & { chitFundName: string })[]> {
+  async updateMembership(
+    id: string,
+    status: string,
+    month: string,
+  ): Promise<Membership | undefined> {
+    const updateData: any = {
+      distributedStatus: status,
+      distributedMonth: month,
+    };
+    const [updated] = await db
+      .update(memberships)
+      .set(updateData)
+      .where(eq(memberships.userId, id))
+      .returning();
+    return updated;
+  }
+
+  async getUpcomingPayments(
+    userId: string,
+  ): Promise<(Payment & { chitFundName: string })[]> {
     const results = await db
       .select()
       .from(payments)
@@ -199,7 +293,12 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getAdminStats(): Promise<{ totalUsers: number; activeChitFunds: number; totalRevenue: number; totalPayments: number }> {
+  async getAdminStats(): Promise<{
+    totalUsers: number;
+    activeChitFunds: number;
+    totalRevenue: number;
+    totalPayments: number;
+  }> {
     const [userCount] = await db.select({ count: count() }).from(users);
     const [fundCount] = await db
       .select({ count: count() })

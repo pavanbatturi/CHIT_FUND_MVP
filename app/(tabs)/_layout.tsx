@@ -27,6 +27,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "person", selected: "person.fill" }} />
         <Label>Profile</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="chit-fund-draw">
+        <Icon sf={{ default: "person", selected: "person.fill" }} />
+        <Label>Chit Fund Draw</Label>
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
@@ -45,7 +49,7 @@ function ClassicTabLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textTertiary,
         tabBarLabelStyle: {
-          fontFamily: 'Inter_500Medium',
+          fontFamily: "Inter_500Medium",
           fontSize: 11,
         },
         tabBarStyle: {
@@ -58,9 +62,18 @@ function ClassicTabLayout() {
         },
         tabBarBackground: () =>
           isIOS ? (
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={100}
+              tint={isDark ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
           ) : isWeb ? (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: Colors.surface }]} />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: Colors.surface },
+              ]}
+            />
           ) : null,
       }}
     >
@@ -69,7 +82,11 @@ function ClassicTabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -78,7 +95,11 @@ function ClassicTabLayout() {
         options={{
           title: "Funds",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "wallet" : "wallet-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "wallet" : "wallet-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -87,7 +108,11 @@ function ClassicTabLayout() {
         options={{
           title: "Payments",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "card" : "card-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "card" : "card-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -96,7 +121,24 @@ function ClassicTabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chit-fund-draw"
+        options={{
+          title: "Chit Fund Draw",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

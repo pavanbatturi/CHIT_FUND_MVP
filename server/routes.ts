@@ -536,6 +536,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
+  app.post(
+    "/api/admin/spin-winner",
+    authMiddleware,
+    adminMiddleware,
+    async (req, res) => {
+      try {
+        const { chitFundId, month } = req.body;
+
+        const members = await storage.getMembershipsByChitFund(chitFundId);
+        // Remove already selected winners
+        const remainingMembers = members.filter(
+          (v) => v.distributedStatus !== "Distributed",
+        );
+
+        if (!remainingMembers.length)
+          return res
+            .status(400)
+            .json({ message: "All winners already selected" });
+
+        const randomIndex = Math.floor(Math.random() * remainingMembers.length);
+        const winner = remainingMembers[randomIndex];
+
+        const createdWinner = await storage.updateMembership(
+          winner.userId,
+          "Distributed",
+          month,
+        );
+
+        // Broadcast using socket
+        io.emit("winnerSelected", createdWinner);
+
+        res.json(createdWinner);
+      } catch (err) {
+        res.status(500).json({ message: "Error selecting winner" });
+      }
+    },
+  );
+
   app.post("/api/admin/seed", async (req: Request, res: Response) => {
     try {
       const adminExists = await storage.getUserByEmail("admin@chittrack.com");
