@@ -128,8 +128,8 @@ export const insertChitFundSchema = createInsertSchema(chitFunds).pick({
   availableSlots: true,
   organizerName: true,
   organizerContact: true,
-  //status: false,
-  //startDate: false,
+  status: true,
+  startDate: true,
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).pick({
