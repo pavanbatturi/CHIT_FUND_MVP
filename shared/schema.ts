@@ -130,7 +130,7 @@ export const insertChitFundSchema = createInsertSchema(chitFunds).pick({
   organizerContact: true,
   status: true,
   startDate: true,
-  type: true,
+  chitFundType: true,
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).pick({

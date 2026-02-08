@@ -309,13 +309,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? new Date(req.body.startDate)
             : new Date(),
           status: req.body.status || "upcoming",
-          type: req.body.type || "Increment",
+          chitFundType: req.body.type || "Increment",
         };
         const parsed = insertChitFundSchema.safeParse(inputObj);
         if (!parsed.success) {
           return res
             .status(400)
-            .json({ message: "Invalid input", errors: parsed.error.flatten() });
+            .json({ message: "Invalid input", errors: parsed.error });
         }
 
         const fund = await storage.createChitFund({
