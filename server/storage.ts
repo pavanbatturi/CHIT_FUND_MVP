@@ -172,7 +172,14 @@ export class DatabaseStorage implements IStorage {
 
     const [membership] = await db
       .insert(memberships)
-      .values({ userId, chitFundId, slotNumber, status: "active" })
+      .values({
+        userId,
+        chitFundId,
+        slotNumber,
+        status: "active",
+        distributedMonth: "Feb",
+        distributedStatus: "Not_Distributed",
+      })
       .returning();
 
     await db
