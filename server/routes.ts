@@ -444,23 +444,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Chit fund not found" });
 
         const members = await storage.getMembershipsByChitFund(chitFundId);
+        const payments = await storage.getPaymentsByChitFundId(chitFundId!);
         const createdPayments = [];
+        const values = [
+          10000, 9800, 9500, 9200, 8800, 7800, 7200, 6800, 5800, 4500, 4000,
+          3500,
+        ];
 
         for (const member of members) {
           for (let month = 1; month <= fund.duration; month++) {
             const dueDate = new Date(fund.startDate || new Date());
             dueDate.setMonth(dueDate.getMonth() + month - 1);
-
-            const payment = await storage.createPayment({
-              membershipId: member.id,
-              userId: member.userId,
-              chitFundId: fund.id,
-              amount: fund.monthlyInstallment,
-              monthNumber: month,
-              dueDate: dueDate,
-              status: "pending",
-            });
-            createdPayments.push(payment);
+            const userPayments = payments.find(
+              (v) => v.userId === member.userId,
+            );
+            if (!userPayments) {
+              const payment = await storage.createPayment({
+                membershipId: member.id,
+                userId: member.userId,
+                chitFundId: fund.id,
+                amount: values[month],
+                monthNumber: month,
+                dueDate: dueDate,
+                status: "pending",
+              });
+              createdPayments.push(payment);
+            }
           }
         }
 
