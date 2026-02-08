@@ -61,7 +61,7 @@ export const chitFunds = pgTable("chit_funds", {
   startDate: timestamp("start_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdBy: varchar("created_by").references(() => users.id),
-  chitFundType: text("chitFundType").notNull(),
+  chitFundType: text("chit_fund_type"),
 });
 
 export const memberships = pgTable("memberships", {

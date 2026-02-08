@@ -314,7 +314,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         const parsed = insertChitFundSchema.safeParse(inputObj);
         if (!parsed.success) {
-          console.log(parsed.error);
           insertErrorSchema.safeParse(parsed.error ?? "Error");
           return res
             .status(400)
