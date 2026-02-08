@@ -5,15 +5,18 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import io, { Socket } from "socket.io-client";
 import { apiPost } from "@/lib/api";
 
-const BACKEND_URL = "http://localhost:8082";
+const BACKEND_URL = "https://chit-fund-manager--pavanbatturi.replit.app";
 
-export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
+export default function LotteryScreen() {
+  const isAdmin = true; // 🔥 Replace with real role logic
+
   const socketRef = useRef<Socket | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<any>(null);
 
   const [currentName, setCurrentName] = useState("Waiting...");
   const [winner, setWinner] = useState("");
@@ -22,7 +25,9 @@ export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
 
   /* ---------------- SOCKET CONNECTION ---------------- */
   useEffect(() => {
-    socketRef.current = io(BACKEND_URL);
+    socketRef.current = io(BACKEND_URL, {
+      transports: ["websocket"],
+    });
 
     socketRef.current.on("connect", () => {
       console.log("Socket connected");
@@ -75,20 +80,11 @@ export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
 
     try {
       setLoading(true);
-      const res = await apiPost(`/api/admin/spin-winner`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chitFundId: "123",
-          month: 1,
-        }),
-      });
 
-      if (!res.ok) {
-        throw new Error("Failed to spin winner");
-      }
+      await apiPost("/api/admin/spin-winner", {
+        chitFundId: "123",
+        month: 1,
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -135,11 +131,7 @@ export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
 /* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
+  container: { flex: 1, padding: 20, justifyContent: "center" },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -154,13 +146,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
   },
-  winnerBox: {
-    backgroundColor: "#bbf7d0",
-  },
-  name: {
-    fontSize: 26,
-    fontWeight: "bold",
-  },
+  winnerBox: { backgroundColor: "#bbf7d0" },
+  name: { fontSize: 26, fontWeight: "bold" },
   winnerText: {
     textAlign: "center",
     fontSize: 20,
@@ -174,12 +161,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
-  disabledButton: {
-    backgroundColor: "#94a3b8",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  disabledButton: { backgroundColor: "#94a3b8" },
+  buttonText: { color: "white", fontSize: 16, fontWeight: "600" },
 });

@@ -26,6 +26,10 @@ function NativeAdminTabLayout() {
         <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
         <Label>Settings</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="chit-fund-draw">
+        <Icon sf={{ default: "dice", selected: "dice.fill" }} />
+        <Label>Chit Draw</Label>
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
@@ -40,10 +44,10 @@ function ClassicAdminTabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#7C3AED',
+        tabBarActiveTintColor: "#7C3AED",
         tabBarInactiveTintColor: Colors.textTertiary,
         tabBarLabelStyle: {
-          fontFamily: 'Inter_500Medium',
+          fontFamily: "Inter_500Medium",
           fontSize: 11,
         },
         tabBarStyle: {
@@ -56,9 +60,18 @@ function ClassicAdminTabLayout() {
         },
         tabBarBackground: () =>
           isIOS ? (
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={100}
+              tint={isDark ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
           ) : isWeb ? (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: Colors.surface }]} />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: Colors.surface },
+              ]}
+            />
           ) : null,
       }}
     >
@@ -67,7 +80,11 @@ function ClassicAdminTabLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "stats-chart" : "stats-chart-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -76,7 +93,11 @@ function ClassicAdminTabLayout() {
         options={{
           title: "Funds",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "wallet" : "wallet-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "wallet" : "wallet-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -85,7 +106,11 @@ function ClassicAdminTabLayout() {
         options={{
           title: "Users",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "people" : "people-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "people" : "people-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -94,7 +119,24 @@ function ClassicAdminTabLayout() {
         options={{
           title: "Settings",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "settings" : "settings-outline"} size={24} color={color} />
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chit-fund-draw"
+        options={{
+          title: "Chit Fund Draw",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "dice" : "dice-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

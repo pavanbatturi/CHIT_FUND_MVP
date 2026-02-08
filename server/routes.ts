@@ -9,7 +9,8 @@ import {
   insertChitFundSchema,
   insertErrorSchema,
 } from "@shared/schema";
-
+import { initSocket } from "./socket";
+import { getIO } from "./socket";
 const JWT_SECRET = process.env.SESSION_SECRET || "chit-fund-secret-key-2024";
 
 interface AuthRequest extends Request {
@@ -545,17 +546,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { chitFundId, month } = req.body;
 
         const members = await storage.getMembershipsByChitFund(chitFundId);
-        // Remove already selected winners
+
         const remainingMembers = members.filter(
           (v) => v.distributedStatus !== "Distributed",
         );
 
         if (!remainingMembers.length)
-          return res
-            .status(400)
-            .json({ message: "All winners already selected" });
+          return res.status(400).json({
+            message: "All winners already selected",
+          });
 
         const randomIndex = Math.floor(Math.random() * remainingMembers.length);
+
         const winner = remainingMembers[randomIndex];
 
         const createdWinner = await storage.updateMembership(
@@ -564,7 +566,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           month,
         );
 
-        // Broadcast using socket
+        // ✅ Correct socket usage
+        const io = getIO();
         io.emit("winnerSelected", createdWinner);
 
         res.json(createdWinner);
@@ -666,5 +669,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  initSocket(httpServer);
   return httpServer;
 }
