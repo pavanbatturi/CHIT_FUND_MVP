@@ -455,24 +455,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           for (let month = 1; month <= fund.duration; month++) {
             const dueDate = new Date(fund.startDate || new Date());
             dueDate.setMonth(dueDate.getMonth() + month - 1);
-            const userPayments = payments.find(
-              (v) => v.userId === member.userId,
+
+            const userPayment = payments.find(
+              (v) => v.userId === member.userId && v.monthNumber === month,
             );
-            if (!userPayments) {
+
+            if (!userPayment) {
               const payment = await storage.createPayment({
                 membershipId: member.id,
                 userId: member.userId,
                 chitFundId: fund.id,
-                amount: values[month],
+                amount: values[month - 1],
                 monthNumber: month,
                 dueDate: dueDate,
                 status: "pending",
               });
+
               createdPayments.push(payment);
             }
           }
         }
-
         return res.status(201).json({ count: createdPayments.length });
       } catch (error: any) {
         insertErrorSchema.safeParse(error ?? "Error");
