@@ -55,7 +55,7 @@ export default function ProfileScreen() {
     {
       icon: 'help-circle-outline' as const,
       label: 'Help & Support',
-      onPress: () => Alert.alert('Support', 'Contact us at support@chittrack.com'),
+      onPress: () => Alert.alert('Help & Support', 'For any help or support, contact us:\n\nEmail: admin@chittracker@gmail.com\nPhone: 9701554623'),
       color: '#D97706',
     },
     {
