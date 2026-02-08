@@ -48,7 +48,7 @@ export default function ManageFundsScreen() {
     organizerName: "",
     organizerContact: "",
     status: "",
-    startDate: "",
+    //startDate: "",
     type: "",
   });
 
@@ -99,7 +99,7 @@ export default function ManageFundsScreen() {
       organizerName: "",
       organizerContact: "",
       status: "",
-      startDate: "",
+      // startDate: "",
       type: "",
     });
   }
@@ -129,7 +129,7 @@ export default function ManageFundsScreen() {
       organizerName: formData.organizerName,
       organizerContact: formData.organizerContact || null,
       status: formData.status,
-      startDate: new Date(formData.startDate) || new Date(),
+      // startDate: new Date(formData.startDate) || new Date(),
       type: formData.type || "Increment",
     });
   }
@@ -356,11 +356,11 @@ export default function ManageFundsScreen() {
                   label: "Status",
                   placeholder: "Active or Upcoming",
                 },
-                {
-                  key: "startDate",
-                  label: "Start Date",
-                  placeholder: "DD/MM/YYYY",
-                },
+                // {
+                //   key: "startDate",
+                //   label: "Start Date",
+                //   placeholder: "DD/MM/YYYY",
+                // },
               ].map((field) => (
                 <View key={field.key} style={styles.formField}>
                   <Text style={styles.formLabel}>{field.label}</Text>

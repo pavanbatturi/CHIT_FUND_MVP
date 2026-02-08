@@ -309,8 +309,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? new Date(req.body.startDate)
             : new Date(),
           status: req.body.status || "upcoming",
+          type: req.body.type || "Increment",
         };
-        const parsed = insertChitFundSchema.safeParse(req.body);
+        const parsed = insertChitFundSchema.safeParse(inputObj);
         if (!parsed.success) {
           return res
             .status(400)
