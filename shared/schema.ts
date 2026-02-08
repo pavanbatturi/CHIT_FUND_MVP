@@ -77,7 +77,7 @@ export const memberships = pgTable("memberships", {
   slotNumber: integer("slot_number"),
   status: membershipStatusEnum("status").notNull().default("active"),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
-  distributedStatus: text("distributed_status").default("Not_Distributed"),
+  distributedStatus: text("distributed_status"),
   distributedMonth: text("distributed_month"),
 });
 
