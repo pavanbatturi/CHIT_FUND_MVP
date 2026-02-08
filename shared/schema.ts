@@ -8,6 +8,7 @@ import {
   timestamp,
   boolean,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -60,6 +61,7 @@ export const chitFunds = pgTable("chit_funds", {
   startDate: timestamp("start_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdBy: varchar("created_by").references(() => users.id),
+  chitFundType: text("chitFundType").notNull(),
 });
 
 export const memberships = pgTable("memberships", {
@@ -96,6 +98,13 @@ export const payments = pgTable("payments", {
   paidDate: timestamp("paid_date"),
   status: paymentStatusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const errorLogs = pgTable("errorlogs", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  error: jsonb("error").notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -143,6 +152,10 @@ export const insertPaymentSchema = createInsertSchema(payments).pick({
   status: true,
 });
 
+export const insertErrorSchema = createInsertSchema(errorLogs).pick({
+  error: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type ChitFund = typeof chitFunds.$inferSelect;
@@ -150,3 +163,5 @@ export type InsertChitFund = z.infer<typeof insertChitFundSchema>;
 export type Membership = typeof memberships.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Error = typeof errorLogs.$inferSelect;
+export type InsertError = z.infer<typeof insertErrorSchema>;

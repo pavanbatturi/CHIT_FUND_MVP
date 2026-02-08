@@ -7,6 +7,7 @@ import {
   signupSchema,
   loginSchema,
   insertChitFundSchema,
+  insertErrorSchema,
 } from "@shared/schema";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "chit-fund-secret-key-2024";
@@ -314,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const parsed = insertChitFundSchema.safeParse(inputObj);
         if (!parsed.success) {
           console.log(parsed.error);
+          insertErrorSchema.safeParse(parsed.error ?? "Error");
           return res
             .status(400)
             .json({ message: "Invalid input", errors: parsed.error });
@@ -552,6 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         organizerContact: "9876543210",
         status: "active",
         startDate,
+        chitFundType: "Increment",
       });
 
       await storage.createChitFund({
@@ -567,6 +570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         organizerContact: "9876543210",
         status: "active",
         startDate,
+        chitFundType: "Increment",
       });
 
       await storage.createChitFund({
@@ -582,6 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         organizerContact: "9876543210",
         status: "upcoming",
         startDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        chitFundType: "Increment",
       });
 
       return res.json({ message: "Seed data created successfully" });
