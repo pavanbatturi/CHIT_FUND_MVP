@@ -30,7 +30,7 @@ export default function PaymentsScreen() {
 
   const { data, isLoading, refetch, isRefetching } = useQuery<PaymentItem[]>({
     queryKey: ['my-admin-payments'],
-    queryFn: () => apiGet<PaymentItem[]>('/api/my-payments'),
+    queryFn: () => apiGet<PaymentItem[]>('/api/my-admin-payments'),
   });
 
   // ⭐ Mutation to mark payment as paid
