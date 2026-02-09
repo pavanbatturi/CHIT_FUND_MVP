@@ -245,6 +245,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   app.get(
+    "/api/my-admin-payments",
+    authMiddleware,
+    async (req: AuthRequest, res: Response) => {
+      try {
+        const allPayments = await storage.getAllPayments();
+        return res.json(allPayments);
+      } catch (error: any) {
+        insertErrorSchema.safeParse(error ?? "Error");
+        return res.status(500).json({ message: error.message });
+      }
+    },
+  );
+
+  app.get(
     "/api/my-upcoming-payments",
     authMiddleware,
     async (req: AuthRequest, res: Response) => {

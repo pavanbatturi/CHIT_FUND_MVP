@@ -222,6 +222,19 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
+  async getAllPayments(): Promise<(Payment & { chitFundName: string })[]> {
+    const results = await db
+      .select()
+      .from(payments)
+      .innerJoin(chitFunds, eq(payments.chitFundId, chitFunds.id))
+      .orderBy(desc(payments.dueDate));
+
+    return results.map((r) => ({
+      ...r.payments,
+      chitFundName: r.chit_funds.name,
+    }));
+  }
+
   async getPaymentsByChitFundId(
     chitFundId: string,
   ): Promise<(Payment & { chitFundName: string })[]> {

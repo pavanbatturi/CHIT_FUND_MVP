@@ -29,7 +29,7 @@ export default function PaymentsScreen() {
   const [filter, setFilter] = useState<Filter>('all');
 
   const { data, isLoading, refetch, isRefetching } = useQuery<PaymentItem[]>({
-    queryKey: ['my-payments'],
+    queryKey: ['my-admin-payments'],
     queryFn: () => apiGet<PaymentItem[]>('/api/my-payments'),
   });
 
