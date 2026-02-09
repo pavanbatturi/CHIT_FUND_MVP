@@ -130,6 +130,7 @@ function ClassicAdminTabLayout() {
             />
           ),
         }}
+      />
       <Tabs.Screen
         name="settings"
         options={{
