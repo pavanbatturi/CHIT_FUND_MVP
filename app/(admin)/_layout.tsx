@@ -22,6 +22,10 @@ function NativeAdminTabLayout() {
         <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
         <Label>Users</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="admin-payments">
+        <Icon sf={{ default: "creditcard", selected: "creditcard.fill" }} />
+        <Label>Chit Draw</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
         <Label>Settings</Label>
@@ -114,6 +118,18 @@ function ClassicAdminTabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="admin-payments"
+        options={{
+          title: "Payments",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "creditcard" : "creditcard-outline"}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
       <Tabs.Screen
         name="settings"
         options={{

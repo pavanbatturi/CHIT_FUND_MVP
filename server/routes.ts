@@ -551,10 +551,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           (v) => v.distributedStatus !== "Distributed",
         );
 
-        if (!remainingMembers.length)
+        const io = getIO();
+
+        if (!remainingMembers.length) {
+          io.emit("winnerSelected", {
+            userName: "All winners already selected",
+          });
           return res.status(200).json({
             message: "All winners already selected",
           });
+        }
 
         const randomIndex = Math.floor(Math.random() * remainingMembers.length);
 
@@ -569,7 +575,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (createdWinner) {
           const user = await storage.getUser(winner.userId!);
           const name = user?.name ?? "";
-          const io = getIO();
           io.emit("winnerSelected", { userName: name });
         }
 
