@@ -124,7 +124,7 @@ function ClassicAdminTabLayout() {
           title: "Payments",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "creditcard" : "creditcard-outline"}
+              name={focused ? "card" : "card-outline"}
               size={24}
               color={color}
             />
