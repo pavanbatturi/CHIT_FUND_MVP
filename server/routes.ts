@@ -552,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
 
         if (!remainingMembers.length)
-          return res.status(400).json({
+          return res.status(200).json({
             message: "All winners already selected",
           });
 
@@ -566,9 +566,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           month,
         );
 
-        // ✅ Correct socket usage
-        const io = getIO();
-        io.emit("winnerSelected", createdWinner);
+        if (createdWinner) {
+          const user = await storage.getUser(winner.userId!);
+          const name = user?.name ?? "";
+          const io = getIO();
+          io.emit("winnerSelected", { userName: name });
+        }
 
         res.json(createdWinner);
       } catch (err) {
