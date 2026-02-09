@@ -24,7 +24,7 @@ function NativeAdminTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="admin-payments">
         <Icon sf={{ default: "creditcard", selected: "creditcard.fill" }} />
-        <Label>Chit Draw</Label>
+        <Label>Payments</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
