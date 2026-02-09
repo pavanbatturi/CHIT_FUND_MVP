@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  View, Text, StyleSheet, FlatList, Pressable,
-  ActivityIndicator, RefreshControl, Platform, Alert
-} from 'react-native';
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  RefreshControl,
+  Platform,
+  Alert,
+} from "react-native";
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Ionicons } from "@expo/vector-icons";
 
-import Colors from '@/constants/colors';
-import { apiGet, apiPut } from '@/lib/api';
-import { formatCurrency, formatDate, getStatusColor } from '@/lib/format';
+import Colors from "@/constants/colors";
+import { apiGet, apiPut } from "@/lib/api";
+import { formatCurrency, formatDate, getStatusColor } from "@/lib/format";
 
 interface PaymentItem {
   id: string;
@@ -22,46 +29,42 @@ interface PaymentItem {
   chitFundName: string;
 }
 
-type Filter = 'all' | 'pending' | 'paid' | 'overdue';
+type Filter = "all" | "pending" | "paid" | "overdue";
 
 export default function PaymentsScreen() {
   const insets = useSafeAreaInsets();
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>("all");
 
   const { data, isLoading, refetch, isRefetching } = useQuery<PaymentItem[]>({
-    queryKey: ['my-admin-payments'],
-    queryFn: () => apiGet<PaymentItem[]>('/api/my-admin-payments'),
+    queryKey: ["my-admin-payments"],
+    queryFn: () => apiGet<PaymentItem[]>("/api/my-admin-payments"),
   });
 
   // ⭐ Mutation to mark payment as paid
   const markPaidMutation = useMutation({
     mutationFn: (id: string) =>
-      apiPut(`/api/payments/${id}`, { status: 'paid' }),
+      apiPut(`/api/payments/${id}`, { status: "paid" }),
 
     onSuccess: () => refetch(),
   });
 
   const confirmMarkPaid = (id: string) => {
-    Alert.alert(
-      'Confirm Payment',
-      'Mark this payment as paid?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Yes', onPress: () => markPaidMutation.mutate(id) }
-      ]
-    );
+    Alert.alert("Confirm Payment", "Mark this payment as paid?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Yes", onPress: () => markPaidMutation.mutate(id) },
+    ]);
   };
 
   const filteredData = (data || []).filter((p) =>
-    filter === 'all' ? true : p.status === filter
+    filter === "all" ? true : p.status === filter,
   );
 
   const totalPaid = (data || [])
-    .filter((p) => p.status === 'paid')
+    .filter((p) => p.status === "paid")
     .reduce((s, p) => s + p.amount, 0);
 
   const totalPending = (data || [])
-    .filter((p) => p.status === 'pending')
+    .filter((p) => p.status === "pending")
     .reduce((s, p) => s + p.amount, 0);
 
   if (isLoading) {
@@ -73,10 +76,10 @@ export default function PaymentsScreen() {
   }
 
   const filters: { key: Filter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'pending', label: 'Pending' },
-    { key: 'paid', label: 'Paid' },
-    { key: 'overdue', label: 'Overdue' },
+    { key: "all", label: "All" },
+    { key: "pending", label: "Pending" },
+    { key: "paid", label: "Paid" },
+    { key: "overdue", label: "Overdue" },
   ];
 
   // ⭐ Card moved inside to access mutation
@@ -89,11 +92,11 @@ export default function PaymentsScreen() {
           <View style={[styles.cardIcon, { backgroundColor: statusStyle.bg }]}>
             <Ionicons
               name={
-                payment.status === 'paid'
-                  ? 'checkmark-circle'
-                  : payment.status === 'overdue'
-                  ? 'alert-circle'
-                  : 'time'
+                payment.status === "paid"
+                  ? "checkmark-circle"
+                  : payment.status === "overdue"
+                    ? "alert-circle"
+                    : "time"
               }
               size={20}
               color={statusStyle.text}
@@ -120,14 +123,16 @@ export default function PaymentsScreen() {
             {formatCurrency(payment.amount)}
           </Text>
 
-          <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
+          <View
+            style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}
+          >
             <Text style={[styles.statusText, { color: statusStyle.text }]}>
               {payment.status}
             </Text>
           </View>
 
           {/* ⭐ Mark Paid Button */}
-          {payment.status !== 'paid' && (
+          {payment.status !== "paid" && (
             <Pressable
               style={styles.markPaidBtn}
               onPress={() => confirmMarkPaid(payment.id)}
@@ -145,16 +150,23 @@ export default function PaymentsScreen() {
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 12) },
+          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 12) },
         ]}
       >
         <Text style={styles.headerTitle}>Payments</Text>
 
         <View style={styles.summaryRow}>
           <View
-            style={[styles.summaryCard, { backgroundColor: Colors.successLight }]}
+            style={[
+              styles.summaryCard,
+              { backgroundColor: Colors.successLight },
+            ]}
           >
-            <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
+            <Ionicons
+              name="checkmark-circle"
+              size={16}
+              color={Colors.success}
+            />
             <Text style={[styles.summaryLabel, { color: Colors.success }]}>
               Paid
             </Text>
@@ -164,7 +176,10 @@ export default function PaymentsScreen() {
           </View>
 
           <View
-            style={[styles.summaryCard, { backgroundColor: Colors.warningLight }]}
+            style={[
+              styles.summaryCard,
+              { backgroundColor: Colors.warningLight },
+            ]}
           >
             <Ionicons name="time" size={16} color={Colors.warning} />
             <Text style={[styles.summaryLabel, { color: Colors.warning }]}>
@@ -225,8 +240,8 @@ const styles = StyleSheet.create({
 
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   header: {
@@ -235,40 +250,40 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontFamily: 'Inter_700Bold',
+    fontFamily: "Inter_700Bold",
     fontSize: 24,
     color: Colors.text,
     marginBottom: 14,
   },
 
   summaryRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
     marginBottom: 14,
   },
 
   summaryCard: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     padding: 12,
     borderRadius: 12,
   },
 
   summaryLabel: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: "Inter_500Medium",
     fontSize: 12,
   },
 
   summaryValue: {
-    fontFamily: 'Inter_700Bold',
+    fontFamily: "Inter_700Bold",
     fontSize: 14,
-    marginLeft: 'auto',
+    marginLeft: "auto",
   },
 
   filterRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
 
@@ -284,7 +299,7 @@ const styles = StyleSheet.create({
   },
 
   filterText: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: "Inter_500Medium",
     fontSize: 13,
     color: Colors.textSecondary,
   },
@@ -294,8 +309,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     backgroundColor: Colors.surface,
     borderRadius: 14,
     padding: 14,
@@ -305,7 +320,7 @@ const styles = StyleSheet.create({
   },
 
   cardLeft: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     flex: 1,
   },
@@ -314,14 +329,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   cardInfo: { flex: 1 },
 
   cardTitle: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: "Inter_600SemiBold",
     fontSize: 14,
     color: Colors.text,
   },
@@ -339,12 +354,12 @@ const styles = StyleSheet.create({
   },
 
   cardRight: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     gap: 4,
   },
 
   cardAmount: {
-    fontFamily: 'Inter_700Bold',
+    fontFamily: "Inter_700Bold",
     fontSize: 14,
     color: Colors.text,
   },
@@ -357,8 +372,8 @@ const styles = StyleSheet.create({
 
   statusText: {
     fontSize: 10,
-    fontFamily: 'Inter_600SemiBold',
-    textTransform: 'uppercase',
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
   },
 
   markPaidBtn: {
@@ -372,6 +387,6 @@ const styles = StyleSheet.create({
   markPaidText: {
     color: Colors.white,
     fontSize: 11,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: "Inter_600SemiBold",
   },
 });

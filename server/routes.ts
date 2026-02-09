@@ -504,7 +504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     adminMiddleware,
     async (req: AuthRequest, res: Response) => {
       try {
-        const { status } = req.body;
+        const { status } = "paid";
         const paidDate = status === "paid" ? new Date() : undefined;
         const updated = await storage.updatePaymentStatus(
           req.params.id,
