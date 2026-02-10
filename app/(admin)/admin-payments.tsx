@@ -44,7 +44,8 @@ export default function PaymentsScreen() {
 
   // ⭐ Mutation to mark payment as paid
   const markPaidMutation = useMutation({
-    mutationFn: (id: string) => apiPut(`/api/admin/payments/${id}`),
+    mutationFn: (id: string) =>
+      apiPut(`/api/admin/payments/${id}`, { status: "paid" }),
     onSuccess: () => refetch(),
   });
 
