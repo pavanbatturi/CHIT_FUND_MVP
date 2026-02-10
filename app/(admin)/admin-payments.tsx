@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Platform,
   Alert,
+  Linking, // ⭐ added
 } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,6 +28,7 @@ interface PaymentItem {
   paidDate: string | null;
   status: string;
   chitFundName: string;
+  phoneNumber: string; // ⭐ added
 }
 
 type Filter = "all" | "pending" | "paid" | "overdue";
@@ -42,9 +44,7 @@ export default function PaymentsScreen() {
 
   // ⭐ Mutation to mark payment as paid
   const markPaidMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiPut(`/api/payments/${id}`, { status: "paid" }),
-
+    mutationFn: (id: string) => apiPut(`/api/admin/payments/${id}`),
     onSuccess: () => refetch(),
   });
 
@@ -53,6 +53,32 @@ export default function PaymentsScreen() {
       { text: "Cancel", style: "cancel" },
       { text: "Yes", onPress: () => markPaidMutation.mutate(id) },
     ]);
+  };
+
+  // ⭐ WhatsApp Reminder Function
+  const sendWhatsAppReminder = (payment: PaymentItem) => {
+    const message = `Hello 👋,
+
+This is a friendly reminder for your chit fund payment.
+
+Chit Fund: ${payment.chitFundName}
+Month: ${payment.monthNumber}
+Amount: ${formatCurrency(payment.amount)}
+Due Date: ${formatDate(payment.dueDate)}
+
+Please make the payment at your earliest convenience. Thank you 🙏`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const phone = "919701771625";
+
+    const url = `https://wa.me/${phone}?text=${encodedMessage}`;
+
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) Linking.openURL(url);
+        else Alert.alert("Error", "WhatsApp is not installed");
+      })
+      .catch(() => Alert.alert("Error", "Unable to open WhatsApp"));
   };
 
   const filteredData = (data || []).filter((p) =>
@@ -82,7 +108,6 @@ export default function PaymentsScreen() {
     { key: "overdue", label: "Overdue" },
   ];
 
-  // ⭐ Card moved inside to access mutation
   const PaymentCard = ({ payment }: { payment: PaymentItem }) => {
     const statusStyle = getStatusColor(payment.status);
 
@@ -138,6 +163,17 @@ export default function PaymentsScreen() {
               onPress={() => confirmMarkPaid(payment.id)}
             >
               <Text style={styles.markPaidText}>Mark Paid</Text>
+            </Pressable>
+          )}
+
+          {/* ⭐ WhatsApp Reminder Button */}
+          {payment.status !== "paid" && (
+            <Pressable
+              style={styles.whatsappBtn}
+              onPress={() => sendWhatsAppReminder(payment)}
+            >
+              <Ionicons name="logo-whatsapp" size={14} color="white" />
+              <Text style={styles.whatsappText}>Reminder</Text>
             </Pressable>
           )}
         </View>
@@ -386,6 +422,24 @@ const styles = StyleSheet.create({
 
   markPaidText: {
     color: Colors.white,
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+  },
+
+  // ⭐ WhatsApp styles
+  whatsappBtn: {
+    marginTop: 6,
+    backgroundColor: "#25D366",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  whatsappText: {
+    color: "white",
     fontSize: 11,
     fontFamily: "Inter_600SemiBold",
   },

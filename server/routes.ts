@@ -499,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   app.put(
-    "/api/admin/payments/:id/status",
+    "/api/admin/payments/:id",
     authMiddleware,
     adminMiddleware,
     async (req: AuthRequest, res: Response) => {
