@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, and, desc, count, sql } from "drizzle-orm";
+import { db } from "./db";
 import {
   users,
   chitFunds,
@@ -13,12 +13,6 @@ import {
   type Payment,
   type InsertPayment,
 } from "@shared/schema";
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set");
-}
-
-export const db = drizzle(process.env.DATABASE_URL);
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;

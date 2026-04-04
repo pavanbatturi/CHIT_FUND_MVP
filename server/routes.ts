@@ -13,6 +13,11 @@ import { initSocket } from "./socket";
 import { getIO } from "./socket";
 const JWT_SECRET = process.env.SESSION_SECRET || "chit-fund-secret-key-2024";
 
+function routeParamId(param: string | string[] | undefined): string {
+  if (param == null) return "";
+  return Array.isArray(param) ? param[0] ?? "" : param;
+}
+
 interface AuthRequest extends Request {
   userId?: string;
   userRole?: string;
@@ -171,7 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     authMiddleware,
     async (req: AuthRequest, res: Response) => {
       try {
-        const fund = await storage.getChitFund(req.params.id);
+        const fund = await storage.getChitFund(routeParamId(req.params.id));
         if (!fund)
           return res.status(404).json({ message: "Chit fund not found" });
 
@@ -196,7 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const existing = await storage.getMembership(
           req.userId!,
-          req.params.id,
+          routeParamId(req.params.id),
         );
         if (existing) {
           return res
@@ -206,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const membership = await storage.createMembership(
           req.userId!,
-          req.params.id,
+          routeParamId(req.params.id),
         );
         return res.status(201).json(membership);
       } catch (error: any) {
@@ -364,7 +369,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     adminMiddleware,
     async (req: AuthRequest, res: Response) => {
       try {
-        const updated = await storage.updateChitFund(req.params.id, req.body);
+        const updated = await storage.updateChitFund(
+          routeParamId(req.params.id),
+          req.body,
+        );
         if (!updated)
           return res.status(404).json({ message: "Chit fund not found" });
         return res.json(updated);
@@ -381,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     adminMiddleware,
     async (req: AuthRequest, res: Response) => {
       try {
-        const deleted = await storage.deleteChitFund(req.params.id);
+        const deleted = await storage.deleteChitFund(routeParamId(req.params.id));
         if (!deleted)
           return res.status(404).json({ message: "Chit fund not found" });
         return res.json({ message: "Deleted" });
@@ -507,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const status = "paid";
         const paidDate = status === "paid" ? new Date() : undefined;
         const updated = await storage.updatePaymentStatus(
-          req.params.id,
+          routeParamId(req.params.id),
           status,
           paidDate,
         );
@@ -542,7 +550,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     adminMiddleware,
     async (req: AuthRequest, res: Response) => {
       try {
-        const members = await storage.getMembershipsByChitFund(req.params.id);
+        const members = await storage.getMembershipsByChitFund(
+          routeParamId(req.params.id),
+        );
         return res.json(members);
       } catch (error: any) {
         insertErrorSchema.safeParse(error ?? "Error");

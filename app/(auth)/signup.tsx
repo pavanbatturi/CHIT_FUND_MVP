@@ -35,7 +35,8 @@ export default function SignupScreen() {
     setError('');
     setLoading(true);
     try {
-      await signup(name.trim(), email.trim(), phone.trim(), password);
+      const user = await signup(name.trim(), email.trim(), phone.trim(), password);
+      router.replace(user.role === 'admin' ? '/(admin)' : '/(tabs)');
     } catch (err: any) {
       setError(err.message || 'Signup failed');
     } finally {

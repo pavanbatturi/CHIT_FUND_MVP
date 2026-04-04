@@ -1,6 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { dbReady } from "./db";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -17,19 +19,15 @@ function setupCors(app: express.Application) {
   app.use((req, res, next) => {
     const origins = new Set<string>();
 
-    if (process.env.REPLIT_DEV_DOMAIN) {
-      origins.add(`https://${process.env.REPLIT_DEV_DOMAIN}`);
-    }
-
-    if (process.env.REPLIT_DOMAINS) {
-      process.env.REPLIT_DOMAINS.split(",").forEach((d) => {
-        origins.add(`https://${d.trim()}`);
+    if (process.env.CORS_ALLOWED_ORIGINS) {
+      process.env.CORS_ALLOWED_ORIGINS.split(",").forEach((o) => {
+        const t = o.trim();
+        if (t) origins.add(t);
       });
     }
 
     const origin = req.header("origin");
 
-    // Allow localhost origins for Expo web development (any port)
     const isLocalhost =
       origin?.startsWith("http://localhost:") ||
       origin?.startsWith("http://127.0.0.1:");
@@ -226,6 +224,8 @@ function setupErrorHandler(app: express.Application) {
 }
 
 (async () => {
+  await dbReady;
+
   setupCors(app);
   setupBodyParsing(app);
   setupRequestLogging(app);
@@ -237,14 +237,7 @@ function setupErrorHandler(app: express.Application) {
   setupErrorHandler(app);
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`express server serving on port ${port}`);
-    },
-  );
+  server.listen({ port, host: "0.0.0.0" }, () => {
+    log(`express server serving on port ${port}`);
+  });
 })();

@@ -27,7 +27,8 @@ export default function LoginScreen() {
     setError('');
     setLoading(true);
     try {
-      await login(email.trim(), password);
+      const user = await login(email.trim(), password);
+      router.replace(user.role === 'admin' ? '/(admin)' : '/(tabs)');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

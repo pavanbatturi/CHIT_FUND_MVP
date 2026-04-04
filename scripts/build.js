@@ -39,13 +39,12 @@ function stripProtocol(domain) {
 }
 
 function getDeploymentDomain() {
-  // Check Replit deployment environment variables first
-  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
-    return stripProtocol(process.env.REPLIT_INTERNAL_APP_DOMAIN);
-  }
-
-  if (process.env.REPLIT_DEV_DOMAIN) {
-    return stripProtocol(process.env.REPLIT_DEV_DOMAIN);
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    try {
+      return new URL(process.env.EXPO_PUBLIC_API_URL.trim()).host;
+    } catch {
+      /* fall through */
+    }
   }
 
   if (process.env.EXPO_PUBLIC_DOMAIN) {
@@ -53,7 +52,7 @@ function getDeploymentDomain() {
   }
 
   console.error(
-    "ERROR: No deployment domain found. Set REPLIT_INTERNAL_APP_DOMAIN, REPLIT_DEV_DOMAIN, or EXPO_PUBLIC_DOMAIN",
+    "ERROR: Set EXPO_PUBLIC_API_URL (full URL) or EXPO_PUBLIC_DOMAIN for static export.",
   );
   process.exit(1);
 }
@@ -118,6 +117,9 @@ async function startMetro(expoPublicDomain) {
     ...process.env,
     EXPO_PUBLIC_DOMAIN: expoPublicDomain,
   };
+  if (!env.EXPO_PUBLIC_API_URL) {
+    env.EXPO_PUBLIC_API_URL = `https://${expoPublicDomain}`;
+  }
   metroProcess = spawn("npm", ["run", "expo:start:static:build"], {
     stdio: ["ignore", "pipe", "pipe"],
     detached: false,

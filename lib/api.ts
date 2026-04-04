@@ -1,4 +1,4 @@
-import { fetch } from 'expo/fetch';
+import { fetch, type FetchRequestInit } from 'expo/fetch';
 import { getApiUrl } from '@/lib/query-client';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,10 +30,14 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  return fetch(url.toString(), {
-    ...options,
-    headers,
-  });
+  const init: FetchRequestInit = { headers };
+  if (options.method) init.method = options.method;
+  if (options.body != null) init.body = options.body;
+  if (options.credentials) init.credentials = options.credentials;
+  if (options.redirect) init.redirect = options.redirect;
+  if (options.signal) init.signal = options.signal;
+
+  return fetch(url.toString(), init);
 }
 
 export async function apiGet<T>(path: string): Promise<T> {

@@ -1,12 +1,13 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Alert, Platform,
+  View, Text, StyleSheet, ScrollView, Pressable, Platform, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import Colors from '@/constants/colors';
 import { useAuth } from '@/lib/auth-context';
+import { confirmSignOut } from '@/lib/confirm-sign-out';
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/api';
 
@@ -20,17 +21,9 @@ export default function ProfileScreen() {
   });
 
   function handleLogout() {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          router.replace('/(auth)/login');
-        },
-      },
-    ]);
+    confirmSignOut(async () => {
+      await logout();
+    });
   }
 
   const menuItems = [

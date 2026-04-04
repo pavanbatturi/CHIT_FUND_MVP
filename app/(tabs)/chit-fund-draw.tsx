@@ -8,12 +8,11 @@ import {
 } from "react-native";
 import io, { Socket } from "socket.io-client";
 import { apiPost } from "@/lib/api";
-
-const BACKEND_URL = "http://localhost:8082";
+import { getApiUrl } from "@/lib/query-client";
 
 export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
   const socketRef = useRef<Socket | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [currentName, setCurrentName] = useState("Waiting...");
   const [winner, setWinner] = useState("");
@@ -22,7 +21,7 @@ export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
 
   /* ---------------- SOCKET CONNECTION ---------------- */
   useEffect(() => {
-    socketRef.current = io(BACKEND_URL);
+    socketRef.current = io(getApiUrl(), { transports: ["websocket"] });
 
     socketRef.current.on("connect", () => {
       console.log("Socket connected");
@@ -75,20 +74,10 @@ export default function LotteryScreen({ isAdmin }: { isAdmin: boolean }) {
 
     try {
       setLoading(true);
-      const res = await apiPost(`/api/admin/spin-winner`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chitFundId: "123",
-          month: 1,
-        }),
+      await apiPost("/api/admin/spin-winner", {
+        chitFundId: "123",
+        month: 1,
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to spin winner");
-      }
     } catch (err) {
       console.error(err);
     } finally {

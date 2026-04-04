@@ -1,8 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  ReactNode,
+} from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiRequest, getApiUrl } from '@/lib/query-client';
+import { router } from 'expo-router';
+import { getApiUrl, queryClient } from '@/lib/query-client';
 import { fetch } from 'expo/fetch';
 
 interface AuthUser {
@@ -19,8 +28,13 @@ interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, phone: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
+  signup: (
+    name: string,
+    email: string,
+    phone: string,
+    password: string,
+  ) => Promise<AuthUser>;
   logout: () => Promise<void>;
 }
 
@@ -89,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function login(email: string, password: string) {
+  const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
     const baseUrl = getApiUrl();
     const url = new URL('/api/auth/login', baseUrl);
     const res = await fetch(url.toString(), {
@@ -107,44 +121,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await saveToken(data.token);
     setToken(data.token);
     setUser(data.user);
-  }
+    return data.user as AuthUser;
+  }, []);
 
-  async function signup(name: string, email: string, phone: string, password: string) {
-    const baseUrl = getApiUrl();
-    const url = new URL('/api/auth/signup', baseUrl);
-    const res = await fetch(url.toString(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password }),
-    });
+  const signup = useCallback(
+    async (
+      name: string,
+      email: string,
+      phone: string,
+      password: string,
+    ): Promise<AuthUser> => {
+      const baseUrl = getApiUrl();
+      const url = new URL('/api/auth/signup', baseUrl);
+      const res = await fetch(url.toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, password }),
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Signup failed');
+      }
+
       const data = await res.json();
-      throw new Error(data.message || 'Signup failed');
-    }
+      await saveToken(data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return data.user as AuthUser;
+    },
+    [],
+  );
 
-    const data = await res.json();
-    await saveToken(data.token);
-    setToken(data.token);
-    setUser(data.user);
-  }
-
-  async function logout() {
+  const logout = useCallback(async () => {
     await removeToken();
+    queryClient.clear();
     setToken(null);
     setUser(null);
-  }
+    setTimeout(() => {
+      router.replace('/');
+    }, 0);
+  }, []);
 
-  const value = useMemo(() => ({
-    user,
-    token,
-    isLoading,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
-    login,
-    signup,
-    logout,
-  }), [user, token, isLoading]);
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      isLoading,
+      isAuthenticated: !!user,
+      isAdmin: user?.role === 'admin',
+      login,
+      signup,
+      logout,
+    }),
+    [user, token, isLoading, login, signup, logout],
+  );
 
   return (
     <AuthContext.Provider value={value}>

@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import io, { Socket } from "socket.io-client";
 import { apiPost } from "@/lib/api";
-
-const BACKEND_URL = "https://chit-fund-manager--pavanbatturi.replit.app";
+import { getApiUrl } from "@/lib/query-client";
 
 export default function LotteryScreen() {
   const isAdmin = true; // 🔥 Replace with real role logic
@@ -25,7 +24,7 @@ export default function LotteryScreen() {
 
   /* ---------------- SOCKET CONNECTION ---------------- */
   useEffect(() => {
-    socketRef.current = io(BACKEND_URL, {
+    socketRef.current = io(getApiUrl(), {
       transports: ["websocket"],
     });
 
