@@ -39,6 +39,3 @@ yarn-error.*
 .vercel
 
 .env
-
-# PGlite local data (USE_PGLITE=true)
-.data/
