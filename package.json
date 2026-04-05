@@ -11,7 +11,7 @@
     "server:build": "esbuild server/index.ts --platform=node --bundle --format=esm --outdir=server_dist",
     "server:prod": "node server_dist/index.js",
     "db:push": "drizzle-kit push",
-     "start": "npm run server:prod"
+     "start": "npm run server:prod",
     "lint": "npx expo lint",
     "lint:fix": "npx expo lint --fix"
   },
